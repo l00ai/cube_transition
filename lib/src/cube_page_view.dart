@@ -16,28 +16,28 @@ typedef CubeWidgetBuilder = CubeWidget Function(
 
 class CubePageView extends StatefulWidget {
   /// Called whenever the page in the center of the viewport changes.
-  final ValueChanged<int> onPageChanged;
+  final ValueChanged<int>? onPageChanged;
 
   /// An object that can be used to control the position to which this page
   /// view is scrolled.
-  final PageController controller;
+  final PageController? controller;
 
   /// Builder to customize your items
-  final CubeWidgetBuilder itemBuilder;
+  final CubeWidgetBuilder? itemBuilder;
 
   /// The number of items you have, this is only required if you use [CubePageView.builder]
-  final int itemCount;
+  final int? itemCount;
 
   /// Widgets you want to use inside the [CubePageView], this is only required if you use [CubePageView] constructor
-  final List<Widget> children;
+  final List<Widget>? children;
 
   /// Creates a scrollable list that works page by page from an explicit [List]
   /// of widgets.
   const CubePageView({
-    Key key,
+    Key? key,
     this.onPageChanged,
     this.controller,
-    @required this.children,
+    required this.children,
   })  : itemBuilder = null,
         itemCount = null,
         assert(children != null),
@@ -55,7 +55,7 @@ class CubePageView extends StatefulWidget {
   /// zero and less than [itemCount].
 
   CubePageView.builder({
-    Key key,
+    Key? key,
     @required this.itemCount,
     @required this.itemBuilder,
     this.onPageChanged,
@@ -71,25 +71,25 @@ class CubePageView extends StatefulWidget {
 
 class _CubePageViewState extends State<CubePageView> {
   final _pageNotifier = ValueNotifier(0.0);
-  PageController _pageController;
+  PageController? _pageController;
 
   void _listener() {
-    _pageNotifier.value = _pageController.page;
+    _pageNotifier.value = _pageController!.page!;
   }
 
   @override
   void initState() {
     _pageController = widget.controller ?? PageController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _pageController.addListener(_listener);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _pageController!.addListener(_listener);
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    _pageController.removeListener(_listener);
-    _pageController.dispose();
+    _pageController!.removeListener(_listener);
+    _pageController!.dispose();
     _pageNotifier.dispose();
     super.dispose();
   }
@@ -105,12 +105,12 @@ class _CubePageViewState extends State<CubePageView> {
             controller: _pageController,
             onPageChanged: widget.onPageChanged,
             physics: const ClampingScrollPhysics(),
-            itemCount: widget.itemCount ?? widget.children.length,
+            itemCount: widget.itemCount ?? widget.children!.length,
             itemBuilder: (_, index) {
               if (widget.itemBuilder != null)
-                return widget.itemBuilder(context, index, value);
+                return widget.itemBuilder!(context, index, value);
               return CubeWidget(
-                child: widget.children[index],
+                child: widget.children![index],
                 index: index,
                 pageNotifier: value,
               );
@@ -136,10 +136,10 @@ class CubeWidget extends StatelessWidget {
   final Widget child;
 
   const CubeWidget({
-    Key key,
-    @required this.index,
-    @required this.pageNotifier,
-    @required this.child,
+    Key? key,
+    required this.index,
+    required this.pageNotifier,
+    required this.child,
   }) : super(key: key);
 
   @override
@@ -147,10 +147,10 @@ class CubeWidget extends StatelessWidget {
     final isLeaving = (index - pageNotifier) <= 0;
     final t = (index - pageNotifier);
     final rotationY = lerpDouble(0, 90, t);
-    final opacity = lerpDouble(0, 1, t.abs()).clamp(0.0, 1.0);
+    final opacity = lerpDouble(0, 1, t.abs())!.clamp(0.0, 1.0);
     final transform = Matrix4.identity();
     transform.setEntry(3, 2, 0.003);
-    transform.rotateY(-degToRad(rotationY));
+    transform.rotateY(-degToRad(rotationY!).toDouble());
     return Transform(
       alignment: isLeaving ? Alignment.centerRight : Alignment.centerLeft,
       transform: transform,
